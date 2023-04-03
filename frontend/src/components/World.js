@@ -1,0 +1,44 @@
+import React from "react"
+import { ComposableMap, Geographies, Geography, Graticule, Sphere, ZoomableGroup } from "react-simple-maps"
+
+const geoUrl =
+    "https://raw.githubusercontent.com/deldersveld/topojson/master/world-countries-sans-antarctica.json"
+
+export default function World() {
+    return (
+        <ComposableMap projection="geoMercator">
+            <ZoomableGroup center={[0, 0]} zoom={1}>
+                <Sphere stroke="#E4E5E6" strokeWidth={0.5} />
+                <Graticule stroke="#E4E5E6" strokeWidth={0.5} />
+                <Geographies geography={geoUrl}>
+                    {({ geographies }) =>
+                        geographies.map((geo) => {
+                            console.log(geo)
+                            return <Geography
+                                key={geo.rsmKey}
+                                geography={geo}
+                                onClick={() => console.log(geo.rsmKey)}
+                                stroke="#17159B"
+                                strokeWidth="0.2"
+                                style={{
+                                    default: {
+                                        fill: "#A5D3CB",
+                                        outline: "none"
+                                    },
+                                    hover: {
+                                        fill: "#17159B",
+                                        outline: "none"
+                                    },
+                                    pressed: {
+                                        fill: "#17159B",
+                                        outline: "none"
+                                    },
+                                }}
+                            />
+                        })
+                    }
+                </Geographies>
+            </ZoomableGroup>
+        </ComposableMap>
+    )
+}
