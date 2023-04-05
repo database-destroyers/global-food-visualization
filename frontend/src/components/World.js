@@ -13,12 +13,12 @@ export default function World({ selectedCountries, onSelect }) {
                 <Geographies geography={geoUrl}>
                     {({ geographies }) =>
                         geographies.map((geo) => {
-                            console.log(geo.id)
-                            if (selectedCountries.includes(geo.id)) {
+                            const code = geo.properties['Alpha-2'];
+                            if (code in selectedCountries) {
                                 return <Geography
                                     key={geo.rsmKey}
                                     geography={geo}
-                                    onClick={() => console.log(geo.rsmKey)}
+                                    onClick={(e) => onSelect(code)}
                                     stroke="#17159B"
                                     strokeWidth="0.2"
                                     style={{
@@ -40,7 +40,7 @@ export default function World({ selectedCountries, onSelect }) {
                             return <Geography
                                 key={geo.rsmKey}
                                 geography={geo}
-                                onClick={onSelect}
+                                onClick={(e) => onSelect(code)}
                                 stroke="#17159B"
                                 strokeWidth="0.2"
                                 style={{

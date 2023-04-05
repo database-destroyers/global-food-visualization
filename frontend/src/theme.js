@@ -14,8 +14,7 @@ const theme = extendTheme({
     Heading: {
       baseStyle: {
         color: 'gray.500',
-        fontWeight: 'regular',
-        size: 'lg',
+        fontWeight: 'semibold',
       },
       variants: {
         'title': {
@@ -23,6 +22,9 @@ const theme = extendTheme({
           textTransform: 'uppercase',
           size: '3xl',
           fontWeight: 'bold',
+        },
+        'menu-heading': {
+          fontSize: '2xl',
         }
       }
     }
