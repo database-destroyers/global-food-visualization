@@ -1,8 +1,8 @@
-import { Box, Button, Checkbox, Container, Heading, Stack } from "@chakra-ui/react";
+import { Button, Checkbox, Container, Heading, Stack } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react"
 import * as iso_countries from 'i18n-iso-countries';
 
-const Menu = ({ selectedCountries, onSelect }) => {
+const Menu = ({ selectedCountries, onSelect, onSubmit }) => {
     const [countries, setCountries] = useState({});
 
     useEffect(() => {
@@ -27,7 +27,7 @@ const Menu = ({ selectedCountries, onSelect }) => {
                             })
                         }
                 </Stack>
-                <Button>Submit</Button>
+                <Button onClick={onSubmit}>Submit</Button>
             </Stack>
         </Container>
     )
