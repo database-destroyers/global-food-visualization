@@ -1,4 +1,4 @@
-import { Button, ButtonGroup, Stack } from "@chakra-ui/react";
+import { Button, ButtonGroup } from "@chakra-ui/react";
 import { AddIcon, MinusIcon } from '@chakra-ui/icons'
 import React, { useState } from "react"
 import { ComposableMap, Geographies, Geography, Graticule, Sphere, ZoomableGroup } from "react-simple-maps"
@@ -20,7 +20,6 @@ export default function World({ selectedCountries, onSelect }) {
     }
 
     const handleMoveEnd = (position) => {
-        console.log(position)
         setPosition(position);
       }
 
@@ -43,15 +42,15 @@ export default function World({ selectedCountries, onSelect }) {
                                         strokeWidth="0.2"
                                         style={{
                                             default: {
-                                                fill: "#17159B",
+                                                fill: "#3182CE",
                                                 outline: "none"
                                             },
                                             hover: {
-                                                fill: "#17159B",
+                                                fill: "#D3A5AD",
                                                 outline: "none"
                                             },
                                             pressed: {
-                                                fill: "#17159B",
+                                                fill: "#D3A5AD",
                                                 outline: "none"
                                             },
                                         }}
@@ -69,7 +68,7 @@ export default function World({ selectedCountries, onSelect }) {
                                             outline: "none"
                                         },
                                         hover: {
-                                            fill: "#17159B",
+                                            fill: "#319795",
                                             outline: "none"
                                         },
                                         pressed: {

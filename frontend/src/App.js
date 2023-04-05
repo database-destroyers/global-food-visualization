@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { ChakraProvider } from '@chakra-ui/react';
+import { useState } from 'react';
+import { Box, ChakraProvider, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Stack } from '@chakra-ui/react';
 import * as iso_countries from 'i18n-iso-countries';
 
 import './App.css';
@@ -7,11 +7,13 @@ import World from './components/World';
 import Header from './components/Header';
 import Menu from './components/Menu';
 import theme from './theme';
+import Graph from './components/Graph';
 
 iso_countries.registerLocale(require("i18n-iso-countries/langs/en.json"));
 
 function App() {
   const [countries, setCountries] = useState({});
+  const [displayGraph, setDisplayGraph] = useState(false);
 
   const updateCountries = (key) => {
     console.log(key);
@@ -30,6 +32,23 @@ function App() {
     }
   };
 
+  const handleSubmit = () => {
+    console.log('submit')
+    setDisplayGraph(true);
+  }
+
+  const onClose = () => {
+    setDisplayGraph(false);
+  }
+
+  const renderCountryList = (
+    Object.keys(countries).map((key, i) => (
+      i === Object.keys(countries).length - 1 ?
+        <span>{countries[key]}</span> :
+        <span>{countries[key]}, </span> 
+    ))
+  );
+
   return (
     <ChakraProvider theme={theme}>
       <div className="App">
@@ -37,7 +56,23 @@ function App() {
         <Menu
           selectedCountries={countries}
           onSelect={updateCountries}
+          onSubmit={handleSubmit}
         />
+        <Modal isOpen={displayGraph} onClose={onClose} isCentered>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Visualization Output</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Stack>
+                <Box>
+                  Selected Countries: {renderCountryList}
+                </Box>
+              </Stack>
+              <Graph></Graph>
+            </ModalBody>
+          </ModalContent>
+        </Modal>
         <World
           selectedCountries={countries}
           onSelect={updateCountries}
