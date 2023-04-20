@@ -10,8 +10,11 @@ try {
 }
 
 const express = require('express');
+const cors = require('cors');
 const app = express();
 const port = 5000;
+
+app.use(cors());
 
 app.listen(port, () => console.log("Backend Express API listening on port %s!", port));
 
@@ -31,7 +34,7 @@ app.get('/inflationRate', async (req, res) => {
     const connection = await oracledb.getConnection(dbConfig);
 
     // Construct SQL query
-    const query = `SELECT * FROM commodities WHERE countryName = Germany`;
+    const query = `SELECT * FROM GRICHARDS1.COMMODITY WHERE cName = 'Afghanistan'`;
 
     // Execute the query
     const result = await connection.execute(query);

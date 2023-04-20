@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Box, ChakraProvider, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Stack } from '@chakra-ui/react';
 import * as iso_countries from 'i18n-iso-countries';
+import axios from 'axios';
 
 import './App.css';
 import World from './components/World';
@@ -10,6 +11,8 @@ import theme from './theme';
 import Graph from './components/Graph';
 
 iso_countries.registerLocale(require("i18n-iso-countries/langs/en.json"));
+
+const baseURL = "http://localhost:5000/";
 
 function App() {
   const [countries, setCountries] = useState({});
@@ -32,8 +35,15 @@ function App() {
     }
   };
 
+  const getData = () => {
+    // GET request to different URL depending on query
+    axios.get(`${baseURL}inflationRate`).then((res) => {
+      console.log(res.data);
+    })
+  }
+
   const handleSubmit = () => {
-    console.log('submit')
+    getData();
     setDisplayGraph(true);
   }
 
