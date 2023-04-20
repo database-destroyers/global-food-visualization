@@ -44,9 +44,9 @@ function App() {
   const [displayGraph, setDisplayGraph] = useState(false);
   const [yearRange, setYearRange] = useState([1990, 2020]);
   const [foodItems, setFoodItems] = useState([]);
+  const [graphData, setGraphData] = useState([]);
 
   const updateCountries = (key) => {
-    console.log(key);
     if (key in countries) {
       let newCountries = {
         ...countries,
@@ -62,6 +62,29 @@ function App() {
     }
   };
 
+  const getData = () => {
+    // GET request to different URL depending on query
+    axios.post(`${baseURL}inflationRate`, { startYear: 2011, endYear: 2014, commodities: ["Wheat", "Maize"] }).then((res) => {
+      let transformed = [];
+      console.log(res.data);
+      res.data.forEach(d => {
+        const year = d[1];
+        const i = transformed.findIndex(item => item.year === year);
+        if (i === -1) {
+          //  if year object does not exist, add to array
+          transformed.push({
+            year: d[1],
+            [d[0]]: d[2]
+          });
+        } else {
+          // if year object already exists, add new food/value pair
+          transformed[i] = { ...transformed[i], [d[0]]: d[2]};
+        }
+      });
+      setGraphData(transformed);
+    })
+  }
+
   const updateYears = (val) => {
     setYearRange(val);
   };
@@ -75,13 +98,6 @@ function App() {
       array.splice(i, 1);
       setFoodItems(array);
     }
-  };
-
-  const getData = () => {
-    // GET request to different URL depending on query
-    axios.get(`${baseURL}inflationRate`).then((res) => {
-      console.log(res.data);
-    });
   };
 
   const handleSubmit = () => {
@@ -115,7 +131,7 @@ function App() {
           onSelectFoodItems={updateFoodItems}
           onSubmit={handleSubmit}
         />
-        <Modal isOpen={displayGraph} onClose={onClose} isCentered>
+        <Modal isOpen={displayGraph} onClose={onClose} size="full" isCentered>
           <ModalOverlay />
           <ModalContent>
             <ModalHeader>Visualization Output</ModalHeader>
@@ -124,7 +140,7 @@ function App() {
               <Stack>
                 <Box>Selected Countries: {renderCountryList}</Box>
               </Stack>
-              <Graph></Graph>
+              <Graph data={graphData}></Graph>
             </ModalBody>
           </ModalContent>
         </Modal>
@@ -137,5 +153,3 @@ function App() {
     </ChakraProvider>
   );
 }
-
-export default App;

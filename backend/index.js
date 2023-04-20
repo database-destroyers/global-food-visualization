@@ -2,7 +2,7 @@ const oracledb = require('oracledb');
 const dbConfig = require('./dbconfig.js');
 
 try {
-  oracledb.initOracleClient({libDir: process.env.ORACLE_CLIENT_DIR});
+  oracledb.initOracleClient({ libDir: process.env.ORACLE_CLIENT_DIR });
 } catch (err) {
   console.error('could not find oracle client');
   console.error(err);
@@ -15,6 +15,7 @@ const app = express();
 const port = 5000;
 
 app.use(cors());
+app.use(express.json());
 
 app.listen(port, () => console.log("Backend Express API listening on port %s!", port));
 
@@ -28,13 +29,45 @@ How has the inflation rate developed for all commodities,
 selected commodity categories, or individual commodities over a 
 given time period?
 */
-app.get('/inflationRate', async (req, res) => {
+app.post('/inflationRate', async (req, res) => {
   try {
     // Connect to the Oracle database
+    console.log(req.body);
     const connection = await oracledb.getConnection(dbConfig);
 
+    const startYear = req.body.startYear - 1;
+    const endYear = req.body.endYear;
+
+    let commodities = "";
+    req.body.commodities.forEach((c, i) => {
+      if (i === 0) {
+        commodities = commodities.concat(`cm = '${c}'`);
+      } else {
+        commodities = commodities.concat(` OR cm = '${c}'`);
+      }
+    });
+
     // Construct SQL query
-    const query = `SELECT * FROM GRICHARDS1.COMMODITY WHERE cName = 'Afghanistan'`;
+    const query = `SELECT cm AS "Commodity", c_year AS "Year", ROUND((c_price - p_price) / p_price * 100, 2) AS "Inflation (%)"
+    FROM
+        (
+        SELECT cm, year AS c_year, AVG(price) AS c_price
+        FROM GRICHARDS1.Commodity
+        WHERE year <= ${endYear}
+        AND year > ${startYear}
+        AND (${commodities})
+        GROUP BY year, cm
+        ) JOIN (
+        SELECT cm, year AS p_year, AVG(price) AS p_price
+        FROM GRICHARDS1.Commodity
+        WHERE year < ${endYear}
+        AND year >= ${startYear}
+        AND (${commodities})
+        GROUP BY year, cm
+        ) USING(cm)
+    WHERE (c_year - p_year = 1)
+    ORDER BY cm, c_year    
+    `;
 
     // Execute the query
     const result = await connection.execute(query);
@@ -187,7 +220,7 @@ async function test(req, res) {
     console.log("Successfully connected to Oracle Database!");
 
     data = await connection.execute(
-        "select table_name from user_tables"
+      "select table_name from user_tables"
     );
 
   } catch (err) {
