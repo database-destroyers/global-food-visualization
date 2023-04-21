@@ -44,6 +44,7 @@ function App() {
   const [displayGraph, setDisplayGraph] = useState(false);
   const [yearRange, setYearRange] = useState([1990, 2020]);
   const [foodItems, setFoodItems] = useState([]);
+  const [querySelection, setQuerySelection] = useState(1); 
   const [graphData, setGraphData] = useState([]);
 
   const updateCountries = (key) => {
@@ -100,6 +101,10 @@ function App() {
     }
   };
 
+  const updateQuerySelection = (val) => {
+    setQuerySelection(parseInt(val));
+  }
+
   const handleSubmit = () => {
     getData();
     setDisplayGraph(true);
@@ -126,9 +131,11 @@ function App() {
           selectedCountries={countries}
           selectedYears={yearRange}
           selectedFoodItems={foodItems}
+          selectedQuery={querySelection}
           onSelectCountry={updateCountries}
           onSelectYears={updateYears}
           onSelectFoodItems={updateFoodItems}
+          onSelectQuery={updateQuerySelection}
           onSubmit={handleSubmit}
         />
         <Modal isOpen={displayGraph} onClose={onClose} size="full" isCentered>
@@ -153,3 +160,5 @@ function App() {
     </ChakraProvider>
   );
 }
+
+export default App;

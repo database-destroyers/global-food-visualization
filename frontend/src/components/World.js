@@ -6,7 +6,7 @@ import { ComposableMap, Geographies, Geography, Graticule, Sphere, ZoomableGroup
 const geoUrl =
     "https://raw.githubusercontent.com/deldersveld/topojson/master/world-countries-sans-antarctica.json"
 
-export default function World({ selectedCountries, onSelect }) {
+export default function World({ countryList, selectedCountries, onSelect }) {
     const [position, setPosition] = useState({ coordinates: [0, 50], zoom: 1 });
 
     const handleZoomIn = () => {
@@ -51,6 +51,27 @@ export default function World({ selectedCountries, onSelect }) {
                                             },
                                             pressed: {
                                                 fill: "#D3A5AD",
+                                                outline: "none"
+                                            },
+                                        }}
+                                    />
+                                } else if (!(code in countryList)) {
+                                    return <Geography
+                                        key={geo.rsmKey}
+                                        geography={geo}
+                                        stroke="#17159B"
+                                        strokeWidth="0.2"
+                                        style={{
+                                            default: {
+                                                fill: "#d3d3d3",
+                                                outline: "none"
+                                            },
+                                            hover: {
+                                                fill: "#d3d3d3",
+                                                outline: "none"
+                                            },
+                                            pressed: {
+                                                fill: "#d3d3d3",
                                                 outline: "none"
                                             },
                                         }}
