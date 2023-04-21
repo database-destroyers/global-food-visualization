@@ -23,6 +23,50 @@ app.get('/', (req, res) => {
   test(req, res);
 });
 
+// count all tuples
+app.get('/countAll', async (req, res) => {
+  try {
+    // Connect to the Oracle database
+    const connection = await oracledb.getConnection(dbConfig);
+
+    // Construct SQL query
+    const query = `SELECT SUM(tuples.num)
+    FROM
+    ( SELECT COUNT(*) AS num FROM GRICHARDS1.COMMODITY
+    UNION ALL
+    SELECT COUNT(*) AS num FROM GRICHARDS1.CROPSANDLIVESTOCKYIELD
+    UNION ALL
+    SELECT COUNT(*) AS num FROM GRICHARDS1.CROPYIELD
+    UNION ALL
+    SELECT COUNT(*) AS num FROM GRICHARDS1.CURRENCY
+    UNION ALL 
+    SELECT COUNT(*) AS num FROM GRICHARDS1.FOODINFLATION
+    UNION ALL
+    SELECT COUNT(*) AS num FROM GRICHARDS1.GOVEXPENDITURE
+    UNION ALL
+    SELECT COUNT(*) AS num FROM GRICHARDS1.PRIVEXPENDITURE
+    UNION ALL
+    SELECT COUNT(*) AS num FROM  GRICHARDS1.TEMPCHANGE
+    UNION ALL
+    SELECT COUNT(*) AS num FROM  GRICHARDS1.TRADE ) tuples`;
+
+    // Execute the query
+    const result = await connection.execute(query);
+
+    // Retrieve results
+    const rows = result.rows;
+
+    // Send results as response
+    res.json(rows);
+
+    // Close the connection
+    connection.close();
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server Error');
+  }
+});
+
 //query 1
 /*
 How has the inflation rate developed for all commodities, 

@@ -2,6 +2,7 @@ import { useState } from "react";
 import {
   Box,
   ChakraProvider,
+  Heading,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -44,8 +45,11 @@ function App() {
   const [displayGraph, setDisplayGraph] = useState(false);
   const [yearRange, setYearRange] = useState([1990, 2020]);
   const [foodItems, setFoodItems] = useState([]);
-  const [querySelection, setQuerySelection] = useState(1); 
+  const [analysisFactors, setAnalysisFactors] = useState([]);
+  const [querySelection, setQuerySelection] = useState(1);
   const [graphData, setGraphData] = useState([]);
+  const [displayInfo, setDisplayInfo] = useState(false);
+  const [tupleCount, setTupleCount] = useState();
 
   const updateCountries = (key) => {
     if (key in countries) {
@@ -65,25 +69,33 @@ function App() {
 
   const getData = () => {
     // GET request to different URL depending on query
-    axios.post(`${baseURL}inflationRate`, { startYear: 2011, endYear: 2014, commodities: ["Wheat", "Maize"] }).then((res) => {
-      let transformed = [];
-      console.log(res.data);
-      res.data.forEach(d => {
-        const year = d[1];
-        const i = transformed.findIndex(item => item.year === year);
-        if (i === -1) {
-          //  if year object does not exist, add to array
-          transformed.push({
-            year: d[1],
-            [d[0]]: d[2]
+    switch (querySelection) {
+      case 1:
+        axios.post(`${baseURL}inflationRate`, { startYear: yearRange[0], endYear: yearRange[1], commodities: foodItems }).then((res) => {
+          let transformed = [];
+          console.log(res.data);
+          res.data.forEach(d => {
+            const year = d[1];
+            const i = transformed.findIndex(item => item.year === year);
+            if (i === -1) {
+              //  if year object does not exist, add to array
+              transformed.push({
+                year: d[1],
+                [d[0]]: d[2]
+              });
+            } else {
+              // if year object already exists, add new food/value pair
+              transformed[i] = { ...transformed[i], [d[0]]: d[2] };
+            }
           });
-        } else {
-          // if year object already exists, add new food/value pair
-          transformed[i] = { ...transformed[i], [d[0]]: d[2]};
-        }
-      });
-      setGraphData(transformed);
-    })
+          setGraphData(transformed);
+        });
+      case 2:
+      case 3:
+      case 4:
+      case 5:
+      default:
+    }
   }
 
   const updateYears = (val) => {
@@ -101,6 +113,17 @@ function App() {
     }
   };
 
+  const updateAnalysisFactors = (val) => {
+    const i = analysisFactors.indexOf(val);
+    let array = [...analysisFactors];
+    if (i === -1) {
+      setAnalysisFactors([...array, val]);
+    } else {
+      array.splice(i, 1);
+      setAnalysisFactors(array);
+    }
+  }
+
   const updateQuerySelection = (val) => {
     setQuerySelection(parseInt(val));
   }
@@ -110,8 +133,20 @@ function App() {
     setDisplayGraph(true);
   };
 
-  const onClose = () => {
+  const onGraphClose = () => {
     setDisplayGraph(false);
+  };
+
+  const handleInfoClick = () => {
+    axios.get(`${baseURL}countAll`).then((res) => {
+      console.log(res.data[0][0]);
+      setTupleCount(res.data[0][0]);
+      setDisplayInfo(true);
+    });
+  }
+
+  const onInfoClose = () => {
+    setDisplayInfo(false);
   };
 
   const renderCountryList = Object.keys(countries).map((key, i) =>
@@ -122,32 +157,55 @@ function App() {
     )
   );
 
+  const renderFoodList = foodItems.map((f, i) =>
+    i === foodItems.length - 1 ? (
+      <span>{f}</span>
+    ) : (
+      <span>{f}, </span>
+    )
+  );
+
   return (
     <ChakraProvider theme={theme}>
       <div className="App">
-        <Header />
+        <Header handleInfoClick={handleInfoClick} />
         <Menu
           countryList={countryList}
           selectedCountries={countries}
           selectedYears={yearRange}
           selectedFoodItems={foodItems}
+          selectedFactors={analysisFactors}
           selectedQuery={querySelection}
           onSelectCountry={updateCountries}
           onSelectYears={updateYears}
           onSelectFoodItems={updateFoodItems}
+          onSelectFactors={updateAnalysisFactors}
           onSelectQuery={updateQuerySelection}
           onSubmit={handleSubmit}
         />
-        <Modal isOpen={displayGraph} onClose={onClose} size="full" isCentered>
+        <Modal isOpen={displayGraph} onClose={onGraphClose} size="full" isCentered>
           <ModalOverlay />
           <ModalContent>
             <ModalHeader>Visualization Output</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
               <Stack>
-                <Box>Selected Countries: {renderCountryList}</Box>
+                <Box><Heading as='h4' size='md'>Query {querySelection}</Heading></Box>
+                <Box><b>Selected Countries</b>: {renderCountryList}</Box>
+                <Box><b>Selected Food</b>: {renderFoodList}</Box>
+                <Box><b>Selected Year Range</b>: {yearRange[0]} - {yearRange[1]}</Box>
               </Stack>
-              <Graph data={graphData}></Graph>
+              <Graph data={graphData} type={querySelection} foodItems={foodItems}></Graph>
+            </ModalBody>
+          </ModalContent>
+        </Modal>
+        <Modal isOpen={displayInfo} onClose={onInfoClose} size="sm" isCentered>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Total Tuple Count</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              {tupleCount}
             </ModalBody>
           </ModalContent>
         </Modal>

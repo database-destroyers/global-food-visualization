@@ -29,15 +29,18 @@ const Menu = ({
     selectedCountries,
     selectedFoodItems,
     selectedYears,
+    selectedFactors,
     selectedQuery,
     onSelectCountry,
     onSelectYears,
     onSelectFoodItems,
+    onSelectFactors,
     onSelectQuery,
     onSubmit,
 }) => {
     const [countries, setCountries] = useState({});
     const [foodItems, setFoodItems] = useState([]);
+    const [analysisFactors, setAnalysisFactors] = useState([]);
     const [queries, setQueries] = useState([]);
 
     useEffect(() => {
@@ -54,6 +57,7 @@ const Menu = ({
             "Plantains",
             "Sorghum",
         ]);
+        setAnalysisFactors(["Temperature Change", "Government Expenditure to Agriculture", "Private Expenditure to Agriculture"]);
         setQueries(["Query 1", "Query 2", "Query 3", "Query 4", "Query 5"]);
     }, []);
 
@@ -103,7 +107,6 @@ const Menu = ({
                             <AccordionButton>
                                 <Box as="span" flex="1" textAlign="left">
                                     <Heading variant="heading" fontSize="2xl">
-                                        {" "}
                                         Food Item
                                     </Heading>
                                 </Box>
@@ -111,8 +114,8 @@ const Menu = ({
                             </AccordionButton>
                         </h2>
                         <AccordionPanel pb={1} textAlign="left">
-                            {foodItems.map((f) => (
-                                <>
+                            <Stack>
+                                {foodItems.map((f) => (
                                     <Checkbox
                                         defaultunChecked
                                         onChange={(e) => onSelectFoodItems(f)}
@@ -120,9 +123,8 @@ const Menu = ({
                                     >
                                         {f}
                                     </Checkbox>
-                                    <br></br>
-                                </>
-                            ))}
+                                ))}
+                            </Stack>
                         </AccordionPanel>
                     </AccordionItem>
 
@@ -200,16 +202,14 @@ const Menu = ({
                             </AccordionButton>
                         </h2>
                         <AccordionPanel pb={1} textAlign="left">
-                            <Checkbox defaultunChecked>Analysis 1</Checkbox>
-                            <br></br>
-
-                            <Checkbox defaultunChecked>Analysis 2</Checkbox>
-                            <br></br>
-                        </AccordionPanel>
-
-                        <AccordionPanel pb={1} textAlign="center">
-                            <Checkbox defaultunChecked> Aggregate data?</Checkbox>
-                            <br></br>
+                            <Stack>
+                                {
+                                    analysisFactors.map((a) => <Checkbox
+                                        defaultunChecked
+                                        onChange={(e) => onSelectFactors(a)}
+                                        isChecked={selectedFactors.indexOf(a) !== -1}>{a}</Checkbox>)
+                                }
+                            </Stack>
                         </AccordionPanel>
                     </AccordionItem>
 
@@ -228,18 +228,13 @@ const Menu = ({
                             <RadioGroup onChange={onSelectQuery} value={selectedQuery}>
                                 <Stack>
                                     {
-                                        queries.map((q, i) => <Radio value={i+1}>{q}</Radio>)
+                                        queries.map((q, i) => <Radio value={i + 1}>{q}</Radio>)
                                     }
                                 </Stack>
                             </RadioGroup>
                         </AccordionPanel>
                     </AccordionItem>
-
-
-
                 </Accordion>
-
-
                 <Button onClick={onSubmit}>Submit</Button>
             </Stack>
         </Container >
